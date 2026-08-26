@@ -13,20 +13,71 @@ use Illuminate\Validation\Rule;
 class TicketController extends Controller
 {
     
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
-        $query = Ticket::with(['category', 'reporter'])
-            ->latest();
+        $query = Ticket::with([
+            'category',
+            'reporter'
+        ]);
 
+        // Pelapor hanya boleh melihat tiket miliknya
         if ($user->role === 'PELAPOR') {
             $query->where('reporter_id', $user->id);
         }
 
-        $tickets = $query->get();
+        // Pencarian berdasarkan kode atau judul
+        if ($request->filled('search')) {
 
-        return view('tickets.index', compact('tickets'));
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('code', 'like', "%{$search}%")
+                ->orWhere('title', 'like', "%{$search}%");
+
+            });
+        }
+
+        // Filter kategori
+        if ($request->filled('category')) {
+            $query->where(
+                'category_id',
+                $request->category
+            );
+        }
+
+        // Filter urgensi
+        if ($request->filled('urgency')) {
+            $query->where(
+                'urgency',
+                $request->urgency
+            );
+        }
+
+        // Filter status
+        if ($request->filled('status')) {
+            $query->where(
+                'status',
+                $request->status
+            );
+        }
+
+        $tickets = $query
+            ->latest()
+            ->get();
+
+        $categories = Category::orderBy('name')
+            ->get();
+
+        return view(
+            'tickets.index',
+            compact(
+                'tickets',
+                'categories'
+            )
+        );
     }
 
     public function show(Ticket $ticket)
@@ -49,7 +100,7 @@ class TicketController extends Controller
 
         return view('tickets.show', compact('ticket'));
     }
-    
+
     public function create()
     {
         // Hanya PELAPOR yang boleh membuat tiket

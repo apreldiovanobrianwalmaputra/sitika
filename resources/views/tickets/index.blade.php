@@ -166,6 +166,71 @@
             color: #6b7280;
         }
 
+        .filter-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 7px;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            height: 40px;
+            padding: 0 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            outline: none;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            border-color: #2563eb;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-filter {
+            height: 40px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 0 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-reset {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            background: #e5e7eb;
+            color: #374151;
+            padding: 0 15px;
+            border-radius: 6px;
+        }
+
         @media (max-width: 650px) {
             .navbar {
                 padding: 15px 20px;
@@ -176,6 +241,20 @@
 
             .nav-right {
                 flex-wrap: wrap;
+            }
+            
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-actions {
+                width: 100%;
+            }
+
+            .btn-filter,
+            .btn-reset {
+                flex: 1;
+                justify-content: center;
             }
         }
     </style>
@@ -225,6 +304,166 @@
             <h2>Semua Tiket</h2>
             <p>Daftar seluruh tiket dukungan TI.</p>
         @endif
+
+    </div>
+
+    <div class="filter-card">
+
+        <form
+            action="{{ route('tickets.index') }}"
+            method="GET"
+            class="filter-form"
+        >
+
+            <div class="filter-group search-group">
+
+                <label for="search">
+                    Cari Tiket
+                </label>
+
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Cari kode atau judul..."
+                >
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="category">
+                    Kategori
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                >
+
+                    <option value="">
+                        Semua Kategori
+                    </option>
+
+                    @foreach($categories as $category)
+
+                        <option
+                            value="{{ $category->id }}"
+                            {{ request('category') == $category->id ? 'selected' : '' }}
+                        >
+                            {{ $category->name }}
+                        </option>
+
+                    @endforeach
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="urgency">
+                    Urgensi
+                </label>
+
+                <select
+                    id="urgency"
+                    name="urgency"
+                >
+
+                    <option value="">
+                        Semua Urgensi
+                    </option>
+
+                    <option
+                        value="RENDAH"
+                        {{ request('urgency') === 'RENDAH' ? 'selected' : '' }}
+                    >
+                        RENDAH
+                    </option>
+
+                    <option
+                        value="SEDANG"
+                        {{ request('urgency') === 'SEDANG' ? 'selected' : '' }}
+                    >
+                        SEDANG
+                    </option>
+
+                    <option
+                        value="TINGGI"
+                        {{ request('urgency') === 'TINGGI' ? 'selected' : '' }}
+                    >
+                        TINGGI
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="status">
+                    Status
+                </label>
+
+                <select
+                    id="status"
+                    name="status"
+                >
+
+                    <option value="">
+                        Semua Status
+                    </option>
+
+                    <option
+                        value="OPEN"
+                        {{ request('status') === 'OPEN' ? 'selected' : '' }}
+                    >
+                        OPEN
+                    </option>
+
+                    <option
+                        value="IN_PROGRESS"
+                        {{ request('status') === 'IN_PROGRESS' ? 'selected' : '' }}
+                    >
+                        IN PROGRESS
+                    </option>
+
+                    <option
+                        value="RESOLVED"
+                        {{ request('status') === 'RESOLVED' ? 'selected' : '' }}
+                    >
+                        RESOLVED
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-actions">
+
+                <button
+                    type="submit"
+                    class="btn-filter"
+                >
+                    Terapkan
+                </button>
+
+                <a
+                    href="{{ route('tickets.index') }}"
+                    class="btn-reset"
+                >
+                    Reset
+                </a>
+
+            </div>
+
+        </form>
 
     </div>
 
