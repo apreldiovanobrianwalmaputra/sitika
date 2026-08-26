@@ -41,6 +41,7 @@
         .nav-right {
             display: flex;
             gap: 10px;
+            align-items: center;
         }
 
         .nav-link {
@@ -184,6 +185,87 @@
             border: 1px solid #a7f3d0;
         }
 
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-error ul {
+            margin: 8px 0 0 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            resize: vertical;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .form-group textarea:focus {
+            border-color: #2563eb;
+        }
+
+        .field-error {
+            color: #dc2626;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .btn-process {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-process:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-resolve {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-resolve:hover {
+            background: #15803d;
+        }
+
         @media (max-width: 650px) {
             .navbar {
                 padding: 15px 20px;
@@ -192,6 +274,11 @@
                 gap: 15px;
             }
 
+            .nav-right {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
             .detail-grid {
                 grid-template-columns: 1fr;
             }
@@ -232,6 +319,33 @@
 
 
 <div class="container">
+
+    @if(session('success'))
+
+        <div class="alert-success">
+            {{ session('success') }}
+        </div>
+
+    @endif
+
+
+    @if($errors->any())
+
+        <div class="alert-error">
+
+            <strong>
+                Terjadi kesalahan:
+            </strong>
+
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+
+        </div>
+
+    @endif
 
     <div class="header">
         <div class="code">
@@ -350,6 +464,138 @@
 
 
     <div class="card">
+
+        @if(auth()->user()->role === 'TEKNISI')
+
+            @if($ticket->status === 'OPEN')
+
+                <div class="card">
+
+                    <h3 style="margin-bottom: 10px;">
+                        Proses Tiket
+                    </h3>
+
+                    <p
+                        style="
+                            color: #6b7280;
+                            margin-bottom: 18px;
+                            line-height: 1.6;
+                        "
+                    >
+                        Tiket ini belum ditangani.
+                        Mulai proses untuk mengubah status
+                        menjadi IN_PROGRESS.
+                    </p>
+
+                    <form
+                        action="{{ route('tickets.status.update', $ticket) }}"
+                        method="POST"
+                    >
+
+                        @csrf
+                        @method('PATCH')
+
+                        <input
+                            type="hidden"
+                            name="status"
+                            value="IN_PROGRESS"
+                        >
+
+                        <button
+                            type="submit"
+                            class="btn-process"
+                        >
+                            Mulai Proses
+                        </button>
+
+                    </form>
+
+                </div>
+
+            @elseif($ticket->status === 'IN_PROGRESS')
+
+                <div class="card">
+
+                    <h3 style="margin-bottom: 10px;">
+                        Selesaikan Tiket
+                    </h3>
+
+                    <p
+                        style="
+                            color: #6b7280;
+                            margin-bottom: 18px;
+                            line-height: 1.6;
+                        "
+                    >
+                        Masukkan catatan penyelesaian
+                        sebelum mengubah status tiket
+                        menjadi RESOLVED.
+                    </p>
+
+                    <form
+                        action="{{ route('tickets.status.update', $ticket) }}"
+                        method="POST"
+                    >
+
+                        @csrf
+                        @method('PATCH')
+
+                        <input
+                            type="hidden"
+                            name="status"
+                            value="RESOLVED"
+                        >
+
+                        <div class="form-group">
+
+                            <label for="resolution_note">
+                                Catatan Penyelesaian
+                            </label>
+
+                            <textarea
+                                id="resolution_note"
+                                name="resolution_note"
+                                rows="5"
+                                placeholder="Jelaskan tindakan yang telah dilakukan..."
+                            >{{ old('resolution_note') }}</textarea>
+
+                            @error('resolution_note')
+                                <div class="field-error">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn-resolve"
+                        >
+                            Selesaikan Tiket
+                        </button>
+
+                    </form>
+
+                </div>
+
+            @elseif($ticket->status === 'RESOLVED')
+
+                <div class="card">
+
+                    <h3 style="margin-bottom: 10px;">
+                        Tiket Selesai
+                    </h3>
+
+                    <p style="color: #6b7280;">
+                        Tiket ini sudah diselesaikan dan
+                        tidak dapat diubah lagi.
+                    </p>
+
+                </div>
+
+            @endif
+
+        @endif
 
         <h3>Riwayat Tiket</h3>
 
