@@ -1,225 +1,215 @@
-SITIKA — Sistem Tiket Dukungan TI
+# SITIKA — Sistem Tiket Dukungan TI
 
-SITIKA adalah aplikasi web berbasis Laravel untuk mencatat, memantau, dan mengelola tiket dukungan TI. Sistem memiliki dua role utama, yaitu PELAPOR dan TEKNISI, dengan hak akses yang berbeda.
+SITIKA adalah sistem tiket dukungan TI berbasis Laravel yang membantu pelapor membuat dan memantau tiket, serta membantu teknisi mengelola proses penanganan hingga penyelesaian. Sistem dilengkapi REST API, AJAX, analisis data, dan informasi jaringan.
 
-Fitur Utama
+## Fitur Utama
 
-PELAPOR
+### PELAPOR
+- Login dan logout.
+- Melihat dashboard tiket milik sendiri.
+- Membuat tiket dukungan TI.
+- Melihat daftar dan detail tiket milik sendiri.
+- Melihat riwayat perubahan status tiket.
+- Mencari dan memfilter tiket berdasarkan kode, judul, kategori, urgensi, dan status.
+- Tidak dapat melihat tiket milik pelapor lain.
+- Tidak dapat mengubah status tiket.
 
-Login dan logout.
+### TEKNISI
+- Login dan logout.
+- Melihat seluruh tiket.
+- Mencari dan memfilter tiket.
+- Melihat detail dan riwayat tiket.
+- Mengubah status tiket sesuai alur:
+  - `OPEN`
+  - `IN_PROGRESS`
+  - `RESOLVED`
+- Mengisi catatan penyelesaian saat tiket diselesaikan.
+- Mengubah status melalui Fetch/AJAX tanpa reload halaman.
+- Melihat analisis data tiket.
+- Melihat informasi diagnostik jaringan.
 
-Melihat dashboard tiket milik sendiri.
-
-Membuat tiket dukungan TI.
-
-Melihat daftar dan detail tiket milik sendiri.
-
-Melihat riwayat perubahan status tiket.
-
-Mencari dan memfilter tiket berdasarkan kode, judul, kategori, urgensi, dan status.
-
-Tidak dapat melihat tiket milik pelapor lain.
-
-Tidak dapat mengubah status tiket.
-
-TEKNISI
-
-Login dan logout.
-
-Melihat seluruh tiket.
-
-Mencari dan memfilter tiket.
-
-Melihat detail dan riwayat tiket.
-
-Mengubah status tiket sesuai alur:
-
-OPEN
-
-IN_PROGRESS
-
-RESOLVED
-
-Mengisi catatan penyelesaian saat tiket diselesaikan.
-
-Mengubah status melalui Fetch/AJAX tanpa reload halaman.
-
-Melihat analisis data tiket.
-
-Melihat informasi diagnostik jaringan.
-
-Alur Status Tiket
+## Alur Status Tiket
 
 Status tiket hanya dapat berubah dengan urutan:
 
+```text
 OPEN -> IN_PROGRESS -> RESOLVED
+```
 
 Perubahan status di luar alur tersebut akan ditolak oleh server.
 
-Saat tiket diubah menjadi RESOLVED, teknisi wajib mengisi catatan penyelesaian minimal 10 karakter.
+Saat tiket diubah menjadi `RESOLVED`, teknisi wajib mengisi catatan penyelesaian minimal **10 karakter**.
 
-Format Kode Tiket
+## Format Kode Tiket
 
 Kode tiket dibuat otomatis oleh server dengan format:
 
+```text
 TKT-YYYYMMDD-NNNN
+```
 
 Contoh:
 
+```text
 TKT-20260826-0001
+```
 
-Teknologi
+## Teknologi
 
-PHP 8.2+
+- PHP 8.2+
+- Laravel 12
+- MySQL / MariaDB
+- Blade
+- HTML
+- CSS
+- JavaScript
+- Fetch API / AJAX
+- Laravel Sanctum
+- REST API
+- Git
 
-Laravel 12
+## Instalasi
 
-MySQL / MariaDB
+### 1. Clone repository
 
-Blade
-
-HTML
-
-CSS
-
-JavaScript
-
-Fetch API / AJAX
-
-Laravel Sanctum
-
-REST API
-
-Git
-
-Instalasi
-
-1. Clone repository
-
+```bash
 git clone https://github.com/apreldiovanobrianwalmaputra/sitika.git
 cd sitika
+```
 
-2. Install dependency
+### 2. Install dependency
 
+```bash
 composer install
+```
 
-3. Buat file .env
+### 3. Buat file `.env`
 
 PowerShell:
 
+```powershell
 Copy-Item .env.example .env
+```
 
-4. Generate application key
+### 4. Generate application key
 
+```bash
 php artisan key:generate
+```
 
-5. Buat database
+### 5. Buat database
 
 Buat database MySQL/MariaDB dengan nama:
 
+```text
 sitika
+```
 
-Contoh konfigurasi database pada .env:
+Contoh konfigurasi database pada `.env`:
 
+```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=sitika
 DB_USERNAME=root
 DB_PASSWORD=
+```
 
-6. Jalankan migration dan seeder
+### 6. Jalankan migration dan seeder
 
+```bash
 php artisan migrate:fresh --seed
+```
 
-7. Jalankan aplikasi
+### 7. Jalankan aplikasi
 
+```bash
 php artisan serve
+```
 
 Buka:
 
+```text
 http://127.0.0.1:8000
+```
 
-API menggunakan status HTTP seperti:
+## Akun Demo
 
-200 OK
+### Pelapor Satu
 
-201 Created
+```text
+Email    : pelapor1@demo.local
+Password : Magang123!
+Role     : PELAPOR
+```
 
-401 Unauthorized
+### Pelapor Dua
 
-403 Forbidden
+```text
+Email    : pelapor2@demo.local
+Password : Magang123!
+Role     : PELAPOR
+```
 
-404 Not Found
+### Teknisi TI
 
-422 Unprocessable Content
+```text
+Email    : teknisi@demo.local
+Password : Magang123!
+Role     : TEKNISI
+```
 
-Analisis Data
+Password tersimpan dalam bentuk hash di database.
+
+## Analisis Data
 
 Dashboard teknisi memiliki fitur analisis data berupa:
 
-Tingkat penyelesaian tiket.
+- Tingkat penyelesaian tiket.
+- Rata-rata waktu penyelesaian.
+- Jumlah lokasi berbeda yang tercatat.
+- Grafik tiket berdasarkan kategori.
+- Grafik tiket berdasarkan urgensi.
 
-Rata-rata waktu penyelesaian.
+Fitur analisis hanya dapat dilihat oleh **TEKNISI**.
 
-Jumlah lokasi berbeda yang tercatat.
-
-Grafik tiket berdasarkan kategori.
-
-Grafik tiket berdasarkan urgensi.
-
-Fitur analisis hanya dapat dilihat oleh TEKNISI.
-
-Informasi Jaringan
+## Informasi Jaringan
 
 Teknisi dapat membuka:
 
+```text
 /network-info
+```
 
 Halaman ini menampilkan informasi diagnostik jaringan, seperti:
 
-IP client.
-
-Jenis IP client.
-
-IP server.
-
-Jenis IP server.
-
-Host.
-
-Port.
-
-Protokol.
-
-Skema HTTP/HTTPS.
-
-User Agent.
+- IP client.
+- Jenis IP client.
+- IP server.
+- Jenis IP server.
+- Host.
+- Port.
+- Protokol.
+- Skema HTTP/HTTPS.
+- User Agent.
 
 Pelapor tidak memiliki akses ke halaman ini.
 
-Keamanan dan Hak Akses
+## Keamanan dan Hak Akses
 
-Password disimpan dalam bentuk hash.
+- Password disimpan dalam bentuk hash.
+- Halaman aplikasi dilindungi autentikasi.
+- Pelapor hanya dapat melihat tiket miliknya sendiri.
+- Teknisi tidak dapat membuat tiket sebagai pelapor.
+- Pelapor tidak dapat mengubah status tiket.
+- Validasi dilakukan di sisi server.
+- REST API menggunakan Laravel Sanctum.
+- `.env` tidak disimpan di repository.
+- Error 403 dan 404 memiliki halaman khusus.
 
-Halaman aplikasi dilindungi autentikasi.
+## Developer
 
-Pelapor hanya dapat melihat tiket miliknya sendiri.
+**Apreldiovano Brian Walmaputra**
 
-Teknisi tidak dapat membuat tiket sebagai pelapor.
-
-Pelapor tidak dapat mengubah status tiket.
-
-Validasi dilakukan di sisi server.
-
-REST API menggunakan Laravel Sanctum.
-
-.env tidak disimpan di repository.
-
-Error 403 dan 404 memiliki halaman khusus.
-
-Developer
-
-Apreldiovano Brian Walmaputra
-
-Project: SITIKA — Sistem Tiket Dukungan TI
+Project: **SITIKA — Sistem Tiket Dukungan TI**
