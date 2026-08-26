@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketStatusController;
+use App\Http\Controllers\NetworkController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -23,6 +24,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
+    Route::get(
+        '/network-info',
+        [NetworkController::class, 'index']
+    )->name('network.index');
+    
     Route::get('/tickets', [TicketController::class, 'index'])
         ->name('tickets.index');
 
@@ -39,7 +45,7 @@ Route::middleware('auth')->group(function () {
         '/tickets/{ticket}/status',
         [TicketStatusController::class, 'update']
     )->name('tickets.status.update');
-    
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });

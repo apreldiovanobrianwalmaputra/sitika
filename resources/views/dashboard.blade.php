@@ -431,6 +431,15 @@
             @endif
         </a>
 
+        @if(auth()->user()->role === 'TEKNISI')
+            <a
+                href="{{ route('network.index') }}"
+                class="nav-link"
+            >
+                Info Jaringan
+            </a>
+        @endif
+        
         <div class="user-info">
             <div class="user-name">
                 {{ auth()->user()->name }}
