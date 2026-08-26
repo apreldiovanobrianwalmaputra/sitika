@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $ticket->code }} - SITIKA</title>
 
@@ -266,6 +267,31 @@
             background: #15803d;
         }
 
+        .ajax-message-success {
+            display: block !important;
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .ajax-message-error {
+            display: block !important;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         @media (max-width: 650px) {
             .navbar {
                 padding: 15px 20px;
@@ -278,7 +304,7 @@
                 width: 100%;
                 flex-wrap: wrap;
             }
-            
+
             .detail-grid {
                 grid-template-columns: 1fr;
             }
@@ -319,6 +345,11 @@
 
 
 <div class="container">
+
+    <div
+        id="ajax-message"
+        style="display: none;"
+    ></div>
 
     @if(session('success'))
 
@@ -401,19 +432,28 @@
 
                     @if($ticket->status === 'OPEN')
 
-                        <span class="badge open">
+                        <span
+                            id="ticket-status-badge"
+                            class="badge open"
+                        >
                             OPEN
                         </span>
 
                     @elseif($ticket->status === 'IN_PROGRESS')
 
-                        <span class="badge progress">
+                        <span
+                            id="ticket-status-badge"
+                            class="badge progress"
+                        >
                             IN PROGRESS
                         </span>
 
                     @else
 
-                        <span class="badge resolved">
+                        <span
+                            id="ticket-status-badge"
+                            class="badge resolved"
+                        >
                             RESOLVED
                         </span>
 
@@ -445,161 +485,174 @@
 
     </div>
 
+    <div id="resolution-container">
 
-    @if($ticket->status === 'RESOLVED' && $ticket->resolution_note)
+        @if(
+            $ticket->status === 'RESOLVED'
+            && $ticket->resolution_note
+        )
 
-        <div class="card resolution">
+            <div class="card resolution">
 
-            <h3 style="margin-bottom: 10px;">
-                Catatan Penyelesaian
-            </h3>
+                <h3 style="margin-bottom: 10px;">
+                    Catatan Penyelesaian
+                </h3>
 
-            <p>
-                {{ $ticket->resolution_note }}
-            </p>
+                <p>
+                    {{ $ticket->resolution_note }}
+                </p>
 
-        </div>
+            </div>
 
-    @endif
+        @endif
 
+    </div>
 
     <div class="card">
 
         @if(auth()->user()->role === 'TEKNISI')
 
-            @if($ticket->status === 'OPEN')
+            <div id="ticket-process-panel">
 
-                <div class="card">
+                @if($ticket->status === 'OPEN')
 
-                    <h3 style="margin-bottom: 10px;">
-                        Proses Tiket
-                    </h3>
+                    <div class="card">
 
-                    <p
-                        style="
-                            color: #6b7280;
-                            margin-bottom: 18px;
-                            line-height: 1.6;
-                        "
-                    >
-                        Tiket ini belum ditangani.
-                        Mulai proses untuk mengubah status
-                        menjadi IN_PROGRESS.
-                    </p>
+                        <h3 style="margin-bottom: 10px;">
+                            Proses Tiket
+                        </h3>
 
-                    <form
-                        action="{{ route('tickets.status.update', $ticket) }}"
-                        method="POST"
-                    >
+                        <p
+                            style="
+                                color: #6b7280;
+                                margin-bottom: 18px;
+                                line-height: 1.6;
+                            "
+                        >
+                            Tiket ini belum ditangani.
+                            Mulai proses untuk mengubah status
+                            menjadi IN_PROGRESS.
+                        </p>
 
-                        @csrf
-                        @method('PATCH')
-
-                        <input
-                            type="hidden"
-                            name="status"
-                            value="IN_PROGRESS"
+                        <form
+                            action="{{ route('tickets.status.update', $ticket) }}"
+                            method="POST"
+                            class="ajax-status-form"
                         >
 
-                        <button
-                            type="submit"
-                            class="btn-process"
-                        >
-                            Mulai Proses
-                        </button>
+                            @csrf
+                            @method('PATCH')
 
-                    </form>
+                            <input
+                                type="hidden"
+                                name="status"
+                                value="IN_PROGRESS"
+                            >
 
-                </div>
+                            <button
+                                type="submit"
+                                class="btn-process"
+                            >
+                                Mulai Proses
+                            </button>
 
-            @elseif($ticket->status === 'IN_PROGRESS')
+                        </form>
 
-                <div class="card">
+                    </div>
 
-                    <h3 style="margin-bottom: 10px;">
-                        Selesaikan Tiket
-                    </h3>
+                @elseif($ticket->status === 'IN_PROGRESS')
 
-                    <p
-                        style="
-                            color: #6b7280;
-                            margin-bottom: 18px;
-                            line-height: 1.6;
-                        "
-                    >
-                        Masukkan catatan penyelesaian
-                        sebelum mengubah status tiket
-                        menjadi RESOLVED.
-                    </p>
+                    <div class="card">
 
-                    <form
-                        action="{{ route('tickets.status.update', $ticket) }}"
-                        method="POST"
-                    >
-
-                        @csrf
-                        @method('PATCH')
-
-                        <input
-                            type="hidden"
-                            name="status"
-                            value="RESOLVED"
-                        >
-
-                        <div class="form-group">
-
-                            <label for="resolution_note">
-                                Catatan Penyelesaian
-                            </label>
-
-                            <textarea
-                                id="resolution_note"
-                                name="resolution_note"
-                                rows="5"
-                                placeholder="Jelaskan tindakan yang telah dilakukan..."
-                            >{{ old('resolution_note') }}</textarea>
-
-                            @error('resolution_note')
-                                <div class="field-error">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-
-                        </div>
-
-                        <button
-                            type="submit"
-                            class="btn-resolve"
-                        >
+                        <h3 style="margin-bottom: 10px;">
                             Selesaikan Tiket
-                        </button>
+                        </h3>
 
-                    </form>
+                        <p
+                            style="
+                                color: #6b7280;
+                                margin-bottom: 18px;
+                                line-height: 1.6;
+                            "
+                        >
+                            Masukkan catatan penyelesaian
+                            sebelum mengubah status menjadi
+                            RESOLVED.
+                        </p>
 
-                </div>
+                        <form
+                            action="{{ route('tickets.status.update', $ticket) }}"
+                            method="POST"
+                            class="ajax-status-form"
+                        >
 
-            @elseif($ticket->status === 'RESOLVED')
+                            @csrf
+                            @method('PATCH')
 
-                <div class="card">
+                            <input
+                                type="hidden"
+                                name="status"
+                                value="RESOLVED"
+                            >
 
-                    <h3 style="margin-bottom: 10px;">
-                        Tiket Selesai
-                    </h3>
+                            <div class="form-group">
 
-                    <p style="color: #6b7280;">
-                        Tiket ini sudah diselesaikan dan
-                        tidak dapat diubah lagi.
-                    </p>
+                                <label for="resolution_note">
+                                    Catatan Penyelesaian
+                                </label>
 
-                </div>
+                                <textarea
+                                    id="resolution_note"
+                                    name="resolution_note"
+                                    rows="5"
+                                    placeholder="Jelaskan tindakan yang telah dilakukan..."
+                                ></textarea>
 
-            @endif
+                                <div
+                                    id="resolution-error"
+                                    class="field-error"
+                                ></div>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="btn-resolve"
+                            >
+                                Selesaikan Tiket
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                @else
+
+                    <div class="card">
+
+                        <h3 style="margin-bottom: 10px;">
+                            Tiket Selesai
+                        </h3>
+
+                        <p style="color: #6b7280;">
+                            Tiket ini sudah diselesaikan dan
+                            tidak dapat diubah lagi.
+                        </p>
+
+                    </div>
+
+                @endif
+
+            </div>
 
         @endif
 
         <h3>Riwayat Tiket</h3>
 
-        <div class="timeline">
+        <div
+            class="timeline"
+            id="ticket-history"
+        >
 
             @foreach($ticket->logs->sortBy('created_at') as $log)
 
@@ -647,6 +700,334 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('submit', async function (event) {
+
+    const form = event.target.closest('.ajax-status-form');
+
+    if (!form) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const button = form.querySelector(
+        'button[type="submit"]'
+    );
+
+    const originalButtonText = button.textContent;
+
+    const messageBox = document.getElementById(
+        'ajax-message'
+    );
+
+    const statusInput = form.querySelector(
+        'input[name="status"]'
+    );
+
+    const status = statusInput.value;
+
+    const resolutionNote = form.querySelector(
+        'textarea[name="resolution_note"]'
+    );
+
+    // Loading state
+    button.disabled = true;
+    button.textContent = 'Memproses...';
+
+    messageBox.style.display = 'none';
+    messageBox.className = '';
+    messageBox.textContent = '';
+
+    const payload = {
+        status: status
+    };
+
+    if (resolutionNote) {
+        payload.resolution_note =
+            resolutionNote.value;
+    }
+
+    try {
+
+        const csrfToken = document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute('content');
+
+        const response = await fetch(
+            form.action,
+            {
+                method: 'PATCH',
+
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            let message =
+                data.message ||
+                'Gagal memperbarui status tiket.';
+
+            if (data.errors) {
+
+                const firstError =
+                    Object.values(data.errors)[0];
+
+                if (firstError && firstError[0]) {
+                    message = firstError[0];
+                }
+            }
+
+            throw new Error(message);
+        }
+
+        // SUCCESS MESSAGE
+        messageBox.className =
+            'ajax-message-success';
+
+        messageBox.textContent =
+            data.message;
+
+        // UPDATE STATUS BADGE
+        updateStatusBadge(data.status);
+
+        // UPDATE PANEL TEKNISI
+        updateProcessPanel(
+            data.status,
+            form.action
+        );
+
+        // TAMBAH HISTORY
+        appendHistory(data.log);
+
+        // TAMPILKAN RESOLUTION NOTE
+        if (
+            data.status === 'RESOLVED'
+            && data.resolution_note
+        ) {
+            showResolutionNote(
+                data.resolution_note
+            );
+        }
+
+    } catch (error) {
+
+        messageBox.className =
+            'ajax-message-error';
+
+        messageBox.textContent =
+            error.message;
+
+        button.disabled = false;
+        button.textContent =
+            originalButtonText;
+    }
+});
+
+
+function updateStatusBadge(status) {
+
+    const badge = document.getElementById(
+        'ticket-status-badge'
+    );
+
+    if (!badge) {
+        return;
+    }
+
+    if (status === 'OPEN') {
+
+        badge.className = 'badge open';
+        badge.textContent = 'OPEN';
+
+    } else if (status === 'IN_PROGRESS') {
+
+        badge.className = 'badge progress';
+        badge.textContent = 'IN PROGRESS';
+
+    } else {
+
+        badge.className = 'badge resolved';
+        badge.textContent = 'RESOLVED';
+    }
+}
+
+
+function updateProcessPanel(status, actionUrl) {
+
+    const panel = document.getElementById(
+        'ticket-process-panel'
+    );
+
+    if (!panel) {
+        return;
+    }
+
+    if (status === 'IN_PROGRESS') {
+
+        panel.innerHTML = `
+            <div class="card">
+
+                <h3 style="margin-bottom: 10px;">
+                    Selesaikan Tiket
+                </h3>
+
+                <p
+                    style="
+                        color: #6b7280;
+                        margin-bottom: 18px;
+                        line-height: 1.6;
+                    "
+                >
+                    Masukkan catatan penyelesaian
+                    sebelum mengubah status menjadi
+                    RESOLVED.
+                </p>
+
+                <form
+                    action="${actionUrl}"
+                    method="POST"
+                    class="ajax-status-form"
+                >
+
+                    <input
+                        type="hidden"
+                        name="status"
+                        value="RESOLVED"
+                    >
+
+                    <div class="form-group">
+
+                        <label>
+                            Catatan Penyelesaian
+                        </label>
+
+                        <textarea
+                            name="resolution_note"
+                            rows="5"
+                            placeholder="Jelaskan tindakan yang telah dilakukan..."
+                        ></textarea>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn-resolve"
+                    >
+                        Selesaikan Tiket
+                    </button>
+
+                </form>
+
+            </div>
+        `;
+
+    } else if (status === 'RESOLVED') {
+
+        panel.innerHTML = `
+            <div class="card">
+
+                <h3 style="margin-bottom: 10px;">
+                    Tiket Selesai
+                </h3>
+
+                <p style="color: #6b7280;">
+                    Tiket ini sudah diselesaikan
+                    dan tidak dapat diubah lagi.
+                </p>
+
+            </div>
+        `;
+    }
+}
+
+
+function appendHistory(log) {
+
+    const history = document.getElementById(
+        'ticket-history'
+    );
+
+    if (!history) {
+        return;
+    }
+
+    const item = document.createElement('div');
+
+    item.className = 'timeline-item';
+
+    item.innerHTML = `
+        <div class="timeline-date">
+            ${escapeHtml(log.created_at)}
+        </div>
+
+        <div class="timeline-user">
+            ${escapeHtml(log.user)}
+        </div>
+
+        <div class="timeline-status">
+            ${escapeHtml(log.old_status)}
+            →
+            ${escapeHtml(log.new_status)}
+        </div>
+
+        <div class="timeline-note">
+            ${escapeHtml(log.note ?? '')}
+        </div>
+    `;
+
+    history.appendChild(item);
+}
+
+
+function showResolutionNote(note) {
+
+    const container = document.getElementById(
+        'resolution-container'
+    );
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="card resolution">
+
+            <h3 style="margin-bottom: 10px;">
+                Catatan Penyelesaian
+            </h3>
+
+            <p>
+                ${escapeHtml(note)}
+            </p>
+
+        </div>
+    `;
+}
+
+
+function escapeHtml(value) {
+
+    const div = document.createElement('div');
+
+    div.textContent =
+        value === null || value === undefined
+            ? ''
+            : value;
+
+    return div.innerHTML;
+}
+</script>
 
 </body>
 </html>

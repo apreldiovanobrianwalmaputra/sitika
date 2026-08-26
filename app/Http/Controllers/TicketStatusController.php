@@ -47,7 +47,6 @@ class TicketStatusController extends Controller
         $oldStatus = $ticket->status;
         $newStatus = $validated['status'];
 
-        // Aturan perubahan status yang diperbolehkan
         $validTransition =
             ($oldStatus === 'OPEN' &&
                 $newStatus === 'IN_PROGRESS')
@@ -56,13 +55,23 @@ class TicketStatusController extends Controller
                 $newStatus === 'RESOLVED');
 
         if (!$validTransition) {
+
+            $message =
+                "Perubahan status dari {$oldStatus} ke {$newStatus} tidak diperbolehkan.";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
             return back()->withErrors([
-                'status' =>
-                    "Perubahan status dari {$oldStatus} ke {$newStatus} tidak diperbolehkan.",
+                'status' => $message,
             ]);
         }
 
-        DB::transaction(function () use (
+        $log = DB::transaction(function () use (
             $ticket,
             $oldStatus,
             $newStatus,
@@ -77,7 +86,7 @@ class TicketStatusController extends Controller
 
             $ticket->save();
 
-            TicketLog::create([
+            return TicketLog::create([
                 'ticket_id' => $ticket->id,
                 'user_id' => Auth::id(),
                 'old_status' => $oldStatus,
@@ -89,6 +98,34 @@ class TicketStatusController extends Controller
             ]);
         });
 
+        $log->load('user');
+
+        // Response untuk AJAX
+        if ($request->expectsJson()) {
+
+            return response()->json([
+                'success' => true,
+                'message' =>
+                    'Status tiket berhasil diperbarui.',
+
+                'status' => $ticket->status,
+
+                'resolution_note' =>
+                    $ticket->resolution_note,
+
+                'log' => [
+                    'user' => $log->user->name,
+                    'old_status' => $log->old_status,
+                    'new_status' => $log->new_status,
+                    'note' => $log->note,
+                    'created_at' =>
+                        $log->created_at
+                            ->format('d/m/Y H:i'),
+                ],
+            ]);
+        }
+
+        // Tetap mendukung form biasa
         return redirect()
             ->route('tickets.show', $ticket)
             ->with(
