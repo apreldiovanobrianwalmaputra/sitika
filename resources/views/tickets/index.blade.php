@@ -105,6 +105,7 @@
 
         table {
             width: 100%;
+            min-width: 700px;
             border-collapse: collapse;
         }
 
@@ -161,9 +162,21 @@
         }
 
         .empty {
-            padding: 40px;
+            padding: 45px 20px;
             text-align: center;
             color: #6b7280;
+        }
+
+        .empty strong {
+            display: block;
+            color: #374151;
+            font-size: 16px;
+            margin-bottom: 7px;
+        }
+
+        .empty p {
+            font-size: 14px;
+            line-height: 1.6;
         }
 
         .filter-card {
@@ -192,12 +205,14 @@
         .filter-group input,
         .filter-group select {
             width: 100%;
+            max-width: 100%;
             height: 40px;
             padding: 0 11px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
             background: white;
             outline: none;
+            box-sizing: border-box;
         }
 
         .filter-group input:focus,
@@ -232,6 +247,7 @@
         }
 
         @media (max-width: 650px) {
+
             .navbar {
                 padding: 15px 20px;
                 flex-direction: column;
@@ -240,9 +256,21 @@
             }
 
             .nav-right {
+                width: 100%;
                 flex-wrap: wrap;
             }
-            
+
+            .nav-link,
+            .btn-create,
+            .btn-logout {
+                font-size: 13px;
+            }
+
+            .container {
+                margin-top: 20px;
+                padding: 0 15px;
+            }
+
             .filter-form {
                 grid-template-columns: 1fr;
             }
@@ -256,7 +284,13 @@
                 flex: 1;
                 justify-content: center;
             }
+
+            th,
+            td {
+                white-space: nowrap;
+            }
         }
+
     </style>
 </head>
 
@@ -570,7 +604,44 @@
         @else
 
             <div class="empty">
-                Belum ada tiket yang tersedia.
+
+                @if(
+                    request()->filled('search') ||
+                    request()->filled('category') ||
+                    request()->filled('urgency') ||
+                    request()->filled('status')
+                )
+
+                    <strong>
+                        Tidak ada tiket yang ditemukan.
+                    </strong>
+
+                    <p>
+                        Coba ubah kata pencarian atau filter yang digunakan.
+                    </p>
+
+                @else
+
+                    <strong>
+                        Belum ada tiket.
+                    </strong>
+
+                    @if(auth()->user()->role === 'PELAPOR')
+
+                        <p>
+                            Anda belum memiliki tiket dukungan TI.
+                        </p>
+
+                    @else
+
+                        <p>
+                            Belum ada tiket yang dilaporkan.
+                        </p>
+
+                    @endif
+
+                @endif
+
             </div>
 
         @endif

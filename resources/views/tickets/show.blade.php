@@ -293,6 +293,7 @@
         }
 
         @media (max-width: 650px) {
+
             .navbar {
                 padding: 15px 20px;
                 flex-direction: column;
@@ -305,8 +306,26 @@
                 flex-wrap: wrap;
             }
 
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
             .detail-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .btn-process,
+            .btn-resolve {
+                width: 100%;
+            }
+
+            .form-group textarea {
+                font-size: 16px;
             }
         }
     </style>

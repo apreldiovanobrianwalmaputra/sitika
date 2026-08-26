@@ -209,8 +209,17 @@
                 flex: 1;
             }
 
+            .container {
+                margin-top: 20px;
+                padding: 0 15px;
+            }
+
+            .form-card {
+                padding: 18px;
+            }
+
             .actions {
-                flex-direction: column;
+                flex-direction: column-reverse;
             }
 
             .btn-cancel,

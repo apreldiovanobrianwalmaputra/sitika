@@ -222,12 +222,15 @@
         }
 
         @media (max-width: 900px) {
+
             .cards {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
+
         @media (max-width: 600px) {
+
             .navbar {
                 height: auto;
                 padding: 15px 20px;
@@ -239,18 +242,34 @@
             .navbar-right {
                 width: 100%;
                 justify-content: space-between;
+                flex-wrap: wrap;
             }
 
             .user-info {
                 text-align: left;
             }
 
-            .cards {
-                grid-template-columns: 1fr;
-            }
-
             .container {
                 margin-top: 20px;
+                padding: 0 15px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .card-value {
+                font-size: 26px;
+            }
+
+            th,
+            td {
+                white-space: nowrap;
             }
         }
     </style>
@@ -284,7 +303,7 @@
                 Semua Tiket
             @endif
         </a>
-        
+
         <div class="user-info">
             <div class="user-name">
                 {{ auth()->user()->name }}

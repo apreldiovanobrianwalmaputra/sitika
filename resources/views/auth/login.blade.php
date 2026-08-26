@@ -101,19 +101,6 @@
             border-radius: 7px;
         }
 
-        .demo {
-            margin-top: 25px;
-            padding: 15px;
-            background: #f9fafb;
-            border-radius: 8px;
-            color: #4b5563;
-            font-size: 13px;
-            line-height: 1.7;
-        }
-
-        .demo strong {
-            color: #111827;
-        }
     </style>
 </head>
 
@@ -177,19 +164,6 @@
         </button>
 
     </form>
-
-    <div class="demo">
-        <strong>Akun Demo</strong><br><br>
-
-        Pelapor:<br>
-        pelapor1@demo.local<br><br>
-
-        Teknisi:<br>
-        teknisi@demo.local<br><br>
-
-        Password:<br>
-        Magang123!
-    </div>
 
 </div>
 
