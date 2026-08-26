@@ -267,6 +267,24 @@
 
     <div class="navbar-right">
 
+        <a
+            href="{{ route('tickets.index') }}"
+            style="
+                text-decoration: none;
+                background: #f3f4f6;
+                color: #374151;
+                padding: 9px 14px;
+                border-radius: 6px;
+                font-size: 14px;
+            "
+        >
+            @if(auth()->user()->role === 'PELAPOR')
+                Tiket Saya
+            @else
+                Semua Tiket
+            @endif
+        </a>
+        
         <div class="user-info">
             <div class="user-name">
                 {{ auth()->user()->name }}

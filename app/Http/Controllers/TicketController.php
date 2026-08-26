@@ -12,6 +12,44 @@ use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
 {
+    
+    public function index()
+    {
+        $user = Auth::user();
+
+        $query = Ticket::with(['category', 'reporter'])
+            ->latest();
+
+        if ($user->role === 'PELAPOR') {
+            $query->where('reporter_id', $user->id);
+        }
+
+        $tickets = $query->get();
+
+        return view('tickets.index', compact('tickets'));
+    }
+
+    public function show(Ticket $ticket)
+    {
+        $user = Auth::user();
+
+        // Pelapor hanya boleh membuka tiket miliknya
+        if (
+            $user->role === 'PELAPOR' &&
+            $ticket->reporter_id !== $user->id
+        ) {
+            abort(403);
+        }
+
+        $ticket->load([
+            'category',
+            'reporter',
+            'logs.user',
+        ]);
+
+        return view('tickets.show', compact('ticket'));
+    }
+    
     public function create()
     {
         // Hanya PELAPOR yang boleh membuat tiket

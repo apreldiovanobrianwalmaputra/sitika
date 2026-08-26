@@ -35,4 +35,9 @@ class Ticket extends Model
     {
         return $this->hasMany(TicketLog::class);
     }
+
+    public function getRouteKeyName()
+    {
+        return 'code';
+    }
 }
