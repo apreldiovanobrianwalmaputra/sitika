@@ -1,59 +1,225 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+SITIKA — Sistem Tiket Dukungan TI
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+SITIKA adalah aplikasi web berbasis Laravel untuk mencatat, memantau, dan mengelola tiket dukungan TI. Sistem memiliki dua role utama, yaitu PELAPOR dan TEKNISI, dengan hak akses yang berbeda.
 
-## About Laravel
+Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+PELAPOR
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Login dan logout.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Melihat dashboard tiket milik sendiri.
 
-## Learning Laravel
+Membuat tiket dukungan TI.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Melihat daftar dan detail tiket milik sendiri.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Melihat riwayat perubahan status tiket.
 
-## Laravel Sponsors
+Mencari dan memfilter tiket berdasarkan kode, judul, kategori, urgensi, dan status.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Tidak dapat melihat tiket milik pelapor lain.
 
-### Premium Partners
+Tidak dapat mengubah status tiket.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+TEKNISI
 
-## Contributing
+Login dan logout.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Melihat seluruh tiket.
 
-## Code of Conduct
+Mencari dan memfilter tiket.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Melihat detail dan riwayat tiket.
 
-## Security Vulnerabilities
+Mengubah status tiket sesuai alur:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+OPEN
 
-## License
+IN_PROGRESS
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+RESOLVED
+
+Mengisi catatan penyelesaian saat tiket diselesaikan.
+
+Mengubah status melalui Fetch/AJAX tanpa reload halaman.
+
+Melihat analisis data tiket.
+
+Melihat informasi diagnostik jaringan.
+
+Alur Status Tiket
+
+Status tiket hanya dapat berubah dengan urutan:
+
+OPEN -> IN_PROGRESS -> RESOLVED
+
+Perubahan status di luar alur tersebut akan ditolak oleh server.
+
+Saat tiket diubah menjadi RESOLVED, teknisi wajib mengisi catatan penyelesaian minimal 10 karakter.
+
+Format Kode Tiket
+
+Kode tiket dibuat otomatis oleh server dengan format:
+
+TKT-YYYYMMDD-NNNN
+
+Contoh:
+
+TKT-20260826-0001
+
+Teknologi
+
+PHP 8.2+
+
+Laravel 12
+
+MySQL / MariaDB
+
+Blade
+
+HTML
+
+CSS
+
+JavaScript
+
+Fetch API / AJAX
+
+Laravel Sanctum
+
+REST API
+
+Git
+
+Instalasi
+
+1. Clone repository
+
+git clone https://github.com/apreldiovanobrianwalmaputra/sitika.git
+cd sitika
+
+2. Install dependency
+
+composer install
+
+3. Buat file .env
+
+PowerShell:
+
+Copy-Item .env.example .env
+
+4. Generate application key
+
+php artisan key:generate
+
+5. Buat database
+
+Buat database MySQL/MariaDB dengan nama:
+
+sitika
+
+Contoh konfigurasi database pada .env:
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sitika
+DB_USERNAME=root
+DB_PASSWORD=
+
+6. Jalankan migration dan seeder
+
+php artisan migrate:fresh --seed
+
+7. Jalankan aplikasi
+
+php artisan serve
+
+Buka:
+
+http://127.0.0.1:8000
+
+API menggunakan status HTTP seperti:
+
+200 OK
+
+201 Created
+
+401 Unauthorized
+
+403 Forbidden
+
+404 Not Found
+
+422 Unprocessable Content
+
+Analisis Data
+
+Dashboard teknisi memiliki fitur analisis data berupa:
+
+Tingkat penyelesaian tiket.
+
+Rata-rata waktu penyelesaian.
+
+Jumlah lokasi berbeda yang tercatat.
+
+Grafik tiket berdasarkan kategori.
+
+Grafik tiket berdasarkan urgensi.
+
+Fitur analisis hanya dapat dilihat oleh TEKNISI.
+
+Informasi Jaringan
+
+Teknisi dapat membuka:
+
+/network-info
+
+Halaman ini menampilkan informasi diagnostik jaringan, seperti:
+
+IP client.
+
+Jenis IP client.
+
+IP server.
+
+Jenis IP server.
+
+Host.
+
+Port.
+
+Protokol.
+
+Skema HTTP/HTTPS.
+
+User Agent.
+
+Pelapor tidak memiliki akses ke halaman ini.
+
+Keamanan dan Hak Akses
+
+Password disimpan dalam bentuk hash.
+
+Halaman aplikasi dilindungi autentikasi.
+
+Pelapor hanya dapat melihat tiket miliknya sendiri.
+
+Teknisi tidak dapat membuat tiket sebagai pelapor.
+
+Pelapor tidak dapat mengubah status tiket.
+
+Validasi dilakukan di sisi server.
+
+REST API menggunakan Laravel Sanctum.
+
+.env tidak disimpan di repository.
+
+Error 403 dan 404 memiliki halaman khusus.
+
+Developer
+
+Apreldiovano Brian Walmaputra
+
+Project: SITIKA — Sistem Tiket Dukungan TI
