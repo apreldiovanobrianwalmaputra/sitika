@@ -304,13 +304,37 @@
         <h2>Dashboard</h2>
 
         @if(auth()->user()->role === 'PELAPOR')
+
             <p>
                 Ringkasan tiket dukungan TI yang Anda laporkan.
             </p>
+
+            <div style="margin-top: 15px;">
+
+                <a
+                    href="{{ route('tickets.create') }}"
+                    style="
+                        display: inline-block;
+                        background: #2563eb;
+                        color: white;
+                        text-decoration: none;
+                        padding: 10px 16px;
+                        border-radius: 7px;
+                        font-size: 14px;
+                        font-weight: bold;
+                    "
+                >
+                    + Buat Tiket
+                </a>
+
+            </div>
+
         @else
+
             <p>
                 Ringkasan seluruh tiket dukungan TI.
             </p>
+
         @endif
 
     </div>
